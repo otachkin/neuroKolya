@@ -411,6 +411,7 @@
         })
 
         $('body').on('change', '#cityLeftSelect', function(e) {
+            $(this).children("option:selected").attr('selected', 'selected');
             let selectedData = $(this).children("option:selected").data('special_feature')
             let selectedValue = $(this).children("option:selected").val()
             $('#cityLeftSpecialFeature').html(selectedData)
@@ -418,6 +419,7 @@
         })
 
         $('body').on('change', '#cityRightSelect', function(e) {
+            $(this).children("option:selected").attr('selected', 'selected');
             let selectedData = $(this).children("option:selected").data('special_feature')
             let selectedValue = $(this).children("option:selected").val()
             $('#cityRightSpecialFeature').html(selectedData)
@@ -437,9 +439,9 @@
                 $('#cityLeftSpecialFeature').html('')
                 $('#cityRightSpecialFeature').html('')
                 $('#cityLeftSelect option:selected').removeAttr('selected')
-                $('#cityLeftSelect option').first().attr('selected', 'selected');
                 $('#cityRightSelect option:selected').removeAttr('selected')
-                $('#cityRightSelect option').first().attr('selected', 'selected');
+                $('#cityLeftSelect').prop("selectedIndex", 0);
+                $('#cityRightSelect').prop("selectedIndex", 0);
             }
         });
 
