@@ -295,7 +295,7 @@
                 <div class="card h-100">
                     <div class="card-header">
                         <select class="form-select" id="cityLeftSelect">
-                            <option selected>Выберите левую часть города</option>
+                            <option value="0">Выберите левую часть города</option>
                         </select>
                     </div>
                     <h6 class="card-title p-1">При финальном подсчете очков:</h6>
@@ -306,7 +306,7 @@
                 <div class="card h-100">
                     <div class="card-header">
                         <select class="form-select" id="cityRightSelect">
-                            <option selected>Выберите правую часть города</option>
+                            <option value="0">Выберите правую часть города</option>
                         </select>
                     </div>
                     <h6 class="card-title p-1">Особое свойство города:</h6>
@@ -428,7 +428,18 @@
             let isClear = confirm('Сбролсить всё?');
             if (isClear) {
                 localStorage.clear()
-                window.location.reload();
+                lastMove = 0
+                doneMoves = []
+                doneMovesCount = 1
+                moves = moves.sort((a, b) => 0.5 - Math.random());
+                localStorage.setItem('savedMoves', JSON.stringify(moves))
+                $('#moves').html('')
+                $('#cityLeftSpecialFeature').html('')
+                $('#cityRightSpecialFeature').html('')
+                $('#cityLeftSelect option:selected').removeAttr('selected')
+                $('#cityLeftSelect option').first().attr('selected', 'selected');
+                $('#cityRightSelect option:selected').removeAttr('selected')
+                $('#cityRightSelect option').first().attr('selected', 'selected');
             }
         });
 
