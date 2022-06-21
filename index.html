@@ -6,7 +6,7 @@
 	<meta charset="UTF-8">
 	<link rel="icon" href="icon.png">
 	<link rel="apple-touch-icon" href="icon.png">
-	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=yes; minimal-ui">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, minimal-ui">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script type="text/javascript">
     let citiesRight = [{
@@ -339,7 +339,6 @@
         }
 
         let cityLeft = localStorage.getItem('cityLeft') ? JSON.parse(localStorage.getItem('cityLeft')) : null
-        console.log(cityLeft)
         let cityRight = localStorage.getItem('cityRight') ? JSON.parse(localStorage.getItem('cityRight')) : null
         let lastMove = localStorage.getItem('lastMove') ? localStorage.getItem('lastMove') : 0
         let doneMoves = localStorage.getItem('doneMoves') ? JSON.parse(localStorage.getItem('doneMoves')) : []
@@ -353,10 +352,7 @@
         }
 
         if (cityLeft) {
-        	console.log(cityLeft)
-        	console.log('#cityLeftSelect option[value=' + cityLeft.name + ']')
         	let cityLeftOptionToSelect = $('#cityLeftSelect option[value=' + cityLeft.name + ']')
-        	console.log(cityLeftOptionToSelect)
             cityLeftOptionToSelect.attr('selected', 'selected');
             $('#cityLeftSpecialFeature').html(cityLeft.special_feature)
         }
