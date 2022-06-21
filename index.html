@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head xmlns:og="http://ogp.me/ns#">
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<meta charset="UTF-8">
+	<link rel="icon" href="icon.png">
+	<link rel="apple-touch-icon" href="icon.png">
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=yes; minimal-ui">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script type="text/javascript">
+    let citiesRight = [{
+            name: 'Стоун',
+            special_feature: 'Крадет из соседних городов по 1 КП'
+        },
+        {
+            name: 'Свят',
+            special_feature: 'Крестоносцы из всех городов отправляются в крестовый поход'
+        },
+        {
+            name: 'Слизь',
+            special_feature: 'Коля убивает жителя с самым высоким иммунитетом в своем городе'
+        },
+        {
+            name: 'Хольм',
+            special_feature: 'Коля отправляет в крестовый поход мирного жителя своего города с самым низким иммунитетом'
+        },
+        {
+            name: 'Бург',
+            special_feature: 'Коля переманивает женщину из <b>соседнего</b> города*'
+        },
+        {
+            name: 'Вилль',
+            special_feature: 'Коля меняет местами жителей из <b>соседних</b> городов, которые находятся в одном сословии*'
+        },
+        {
+            name: 'Стан',
+            special_feature: 'Коля уничтожает все эпидемии в соседних городах'
+        },
+        {
+            name: 'Дорф',
+            special_feature: 'Коля заменяет своего жителя с самым высоким иммунитетом на случайную карту из колоды (даже если придет болезнь)'
+        },
+        {
+            name: 'Зден',
+            special_feature: 'Коля берет карту из колоды и немедленно разыгрывает в свой город'
+        },
+        {
+            name: 'Гаген',
+            special_feature: 'Коля заменяет всех персонажей на перекрестке и получает 1 КП'
+        },
+        {
+            name: '-на-Рейне',
+            special_feature: 'Крестоносцы из города Коли уходят в крестовый поход'
+        },
+        {
+            name: 'Град',
+            special_feature: 'Особое свойство города Коля получает 3 КП'
+        }
+    ]
+
+    let citiesLeft = [{
+            name: 'Хладно',
+            special_feature: '+3 ПО за каждую Реликвию'
+        },
+        {
+            name: 'Тупо',
+            special_feature: '+2 за каждого Шута, Менестреля и Трубадура'
+        },
+        {
+            name: 'Сирот',
+            special_feature: '+4 ПО за каждого Младенца и Карлика'
+        },
+        {
+            name: 'Трупо',
+            special_feature: '+1 ПО за каждого Крестоносца и Труп'
+        },
+        {
+            name: 'Смрад',
+            special_feature: '+2 ПО за каждого Прокаженного и Чумного доктора'
+        },
+        {
+            name: 'Содом',
+            special_feature: '+2 ПО за каждую Шлюшку, Распутную девку и Епископа'
+        },
+        {
+            name: 'Вонь',
+            special_feature: '+2 ПО за каждого жителя с иммунитетом выше 70'
+        },
+        {
+            name: 'Говен',
+            special_feature: '+3 По за каждого Отшельника, Приспособленца и Виночерпия'
+        },
+        {
+            name: 'Хряко',
+            special_feature: '+2 ПО за каждого Крестьянина и Монаха'
+        },
+        {
+            name: 'Печаль',
+            special_feature: '+1 ПО за каждую женщину'
+        },
+        {
+            name: 'Гниль',
+            special_feature: '+1 ПО за каждого персонажа с отрицательным ПО'
+        },
+        {
+            name: 'Дурно',
+            special_feature: '+1 По за каждого жителя в сословии Духовенство'
+        }
+    ]
+
+    let moves = [
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Все карты с положительным ПО отправляются в город Коли.<br>
+                    -Все <b>жители</b> с отрицательным, нулевым ПО или <b>болезни</b> отправляются в <b>соседний город</b> справа.
+                    -<i>Все нейтральные жители (серый флаг) отправляются в ословие Священников</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом.`,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Придворных.<br>
+                                -При равенстве - бросьте кубик`
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Все карты с положительным ПО отправляются в город Коли.<br>
+                    -Все <b>жители</b> с отрицательным, нулевым ПО или <b>болезни</b> отправляются в соседний <b>город слева</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Придворных</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым низким иммунитетом.`,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Священнослужителей.<br>
+                                -При равенстве - бросьте кубик`
+        },
+        {
+            move: `Возьмите 2 карты из колоды.<br>
+                    -Обе карты отправляются в город Коли<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Простолюдинов</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Простолюдинов.<br>
+                            -При равенстве - бросьте кубик`
+        },
+        {
+            move: `-Возьмите 3 карты с перекрестка.<br>
+                    -Левая карта уходит в соседний город <b>слева</b>. Правая в соседний город <b>справа</b>. Центральная карта отправляется в город к Коле.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Священников</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым низким иммунитетом.`,
+            decision_maker: `-Игрок с наименьшим количеством очков КП<br>
+                                -При равенстве - бросьте кубик`
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Первая карта уходит в соседний город <b>справа</b>. Вторая в соседний город <b>слева</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Придворных</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым низким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим количеством жителей<br>
+                            -При равенстве - бросьте кубик`
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Первая карта уходит в соседний город <b>справа</b>. Вторая в соседний город <b>слева</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Простолюдинов</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим количеством реликвий.<br>
+                                -При равенстве - бросьте кубик`
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Все карты с положительным ПО отправляются в город Коли.<br>
+                    -Все <b>жители</b> с отрицательным, нулевым ПО или <b>болезни</b> отправляются в соседний город <b>справа</b><br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Священников</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Простолюдинов.
+                            <br>-При равенстве - бросьте кубик`
+
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Все карты с положительным ПО отправляются в город Коли.<br>
+                    -Все <b>жители</b> с отрицательным, нулевым ПО или <b>болезни</b> отправляются в соседний <b>город слева</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Придворных</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым низким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Придворных.<br>
+                            -При равенстве - бросьте кубик`
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Обе карты отправляются в город Коли<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Простолюдинов</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Священнослужителей.<br>
+                            -При равенстве - бросьте кубик`
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Все карты с положительным ПО отправляются в город Коли.<br>
+                    -Все <b>жители</b> с отрицательным, нулевым ПО или <b>болезни</b> отправляются в соседний <b>город справа</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Священников</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим количеством реликвий.<br>
+                            -При равенстве - бросьте кубик`
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Все карты с положительным ПО отправляются в город Коли.<br>
+                    -Все <b>жители</b> с отрицательным, нулевым ПО или <b>болезни</b> отправляются в соседний <b>город слева</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Придворных</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым низким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим количеством очков КП<br>
+                            -При равенстве - бросьте кубик`
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Обе карты отправляются в город Коли<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Простолюдинов</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим количеством жителей<br>
+                            -При равенстве - бросьте кубик`
+
+        },
+        {
+            move: `-Возьмите 3 карты с перекрестка.<br>
+                    -Левая карта уходит в соседний город <b>слева</b>. Правая в соседний город <b>справа</b>. Центральная карта отправляется в город к Коле.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Священников</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым низким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Придворных.<br>
+                                -При равенстве - бросьте кубик`
+
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Первая карта уходит в соседний город <b>справа</b>. Вторая в соседний город <b>слева</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Придворных</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым низким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Простолюдинов.<br>
+                            -При равенстве - бросьте кубик`
+
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Первая карта уходит в соседний город <b>справа</b>. Вторая в соседний город <b>слева</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Простолюдинов</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом.`,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Священнослужителей.<br>
+                            -При равенстве - бросьте кубик`
+
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Все карты с положительным ПО отправляются в город Коли.<br>
+                    -Все <b>жители</b> с отрицательным, нулевым ПО или <b>болезни</b> отправляются в соседний <b>город справа</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Священников</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Простолюдинов.<br>
+                            -При равенстве - бросьте кубик`
+
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Все карты с положительным ПО отправляются в город Коли.<br>
+                    -Все <b>жители</b> с отрицательным, нулевым ПО или <b>болезни</b> отправляются в соседний <b>город слева</b>.<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Придворных</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым низким иммунитетом. `,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Священнослужителей.<br>
+                            -При равенстве - бросьте кубик`
+
+        },
+        {
+            move: `-Возьмите 2 карты из колоды.<br>
+                    -Обе карты отправляются в город Коли<br>
+                    -<i>Все нейтральные жители (серый флаг) отправляются в сословие Простолюдинов</i>`,
+            instant_properties: `Действуют на подходящего жителя с самым высоким иммунитетом.`,
+            decision_maker: `-Игрок с наименьшим ПО в сословии Придворных.<br>
+                            -При равенстве - бросьте кубик`
+        }
+
+    ]
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3>НейроКоля <small class="text-muted">v1.0</small></h3>
+            </div>
+            <div class="col d-flex align-items-center justify-content-end">
+                <button type="button" class="btn btn-danger" id="clearAll">Сбросить игру</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h4>Город коли</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" id="cityLeftBlock">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <select class="form-select" id="cityLeftSelect">
+                            <option selected>Выберите левую часть города</option>
+                        </select>
+                    </div>
+                    <h6 class="card-title p-1">При финальном подсчете очков:</h6>
+                    <div class="card-body p-2" id="cityLeftSpecialFeature"></div>
+                </div>
+            </div>
+            <div class="col" id="cityRightBlock">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <select class="form-select" id="cityRightSelect">
+                            <option selected>Выберите правую часть города</option>
+                        </select>
+                    </div>
+                    <h6 class="card-title p-1">Особое свойство города:</h6>
+                    <div class="card-body p-2" id="cityRightSpecialFeature"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-primary p-3 g-3" id="nextMove">Следующий ход Коли</button>
+        </div>
+        <div class="row p-3 g-3" id="moves">
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+
+        for (const cityRight of citiesRight) {
+            let option = $('<option>' + cityRight.name + '</option>')
+            option.val(cityRight.name)
+            option.attr('data-special_feature', cityRight.special_feature)
+            $('#cityRightSelect').append(option)
+        }
+
+        for (const cityLeft of citiesLeft) {
+            let option = $('<option>' + cityLeft.name + '</option>')
+            option.val(cityLeft.name)
+            option.attr('data-special_feature', cityLeft.special_feature)
+            $('#cityLeftSelect').append(option)
+        }
+
+        let cityLeft = localStorage.getItem('cityLeft') ? JSON.parse(localStorage.getItem('cityLeft')) : null
+        console.log(cityLeft)
+        let cityRight = localStorage.getItem('cityRight') ? JSON.parse(localStorage.getItem('cityRight')) : null
+        let lastMove = localStorage.getItem('lastMove') ? localStorage.getItem('lastMove') : 0
+        let doneMoves = localStorage.getItem('doneMoves') ? JSON.parse(localStorage.getItem('doneMoves')) : []
+        let doneMovesCount = 1
+        let savedMoves = localStorage.getItem('savedMoves')
+        if (savedMoves) {
+            moves = JSON.parse(savedMoves)
+        } else {
+            moves = moves.sort((a, b) => 0.5 - Math.random());
+            localStorage.setItem('savedMoves', JSON.stringify(moves))
+        }
+
+        if (cityLeft) {
+        	console.log(cityLeft)
+        	console.log('#cityLeftSelect option[value=' + cityLeft.name + ']')
+        	let cityLeftOptionToSelect = $('#cityLeftSelect option[value=' + cityLeft.name + ']')
+        	console.log(cityLeftOptionToSelect)
+            cityLeftOptionToSelect.attr('selected', 'selected');
+            $('#cityLeftSpecialFeature').html(cityLeft.special_feature)
+        }
+        if (cityRight) {
+            $('#cityRightSelect option[value=' + cityRight.name + ']').attr('selected', 'selected');
+            $('#cityRightSpecialFeature').html(cityRight.special_feature)
+        }
+
+        let moveCard = $(
+            `<div class="col-md-6 col-xl-4">
+    			<div class="card h-100">
+    				<div class="card-body">
+    					<h5>Ход <b class="doneMovesCount"></b>:</h5>
+    					<p class='move'></p>
+    					<h5>Мгновенные свойства(➶):</h5>
+    					<p class='instant_properties'></p>
+    					<h5>Решения принимает:</h5>
+    					<p class='decision_maker'></p>
+    				</div>
+    			</div>
+    		</div>`
+        )
+
+        if (doneMoves) {
+            for (const move of doneMoves) {
+                let newMoveCard = moveCard.clone()
+                newMoveCard.find('.doneMovesCount').html(doneMovesCount)
+                newMoveCard.find('.move').html(move.move)
+                newMoveCard.find('.instant_properties').html(move.instant_properties)
+                newMoveCard.find('.decision_maker').html(move.decision_maker)
+                $('#moves').prepend(newMoveCard)
+                doneMovesCount++
+            }
+        }
+
+        $('#nextMove').on('click', function() {
+            let move = moves[lastMove]
+            if(!move){
+	            moves = moves.sort((a, b) => 0.5 - Math.random());
+	            localStorage.setItem('savedMoves', JSON.stringify(moves))
+	            lastMove = 0
+	            move = moves[lastMove]
+            }
+            doneMoves.push(move)
+            localStorage.setItem('doneMoves', JSON.stringify(doneMoves))
+            let newMoveCard = moveCard.clone()
+            newMoveCard.find('.doneMovesCount').html(doneMovesCount)
+            newMoveCard.find('.move').html(move.move)
+            newMoveCard.find('.instant_properties').html(move.instant_properties)
+            newMoveCard.find('.decision_maker').html(move.decision_maker)
+            $('#moves').prepend(newMoveCard)
+            lastMove++
+            doneMovesCount++
+            localStorage.setItem('lastMove', lastMove)
+        })
+
+        $('body').on('change', '#cityLeftSelect', function(e) {
+            let selectedData = $(this).children("option:selected").data('special_feature')
+            let selectedValue = $(this).children("option:selected").val()
+            $('#cityLeftSpecialFeature').html(selectedData)
+            localStorage.setItem('cityLeft', JSON.stringify({ name: selectedValue, special_feature: selectedData }))
+        })
+
+        $('body').on('change', '#cityRightSelect', function(e) {
+            let selectedData = $(this).children("option:selected").data('special_feature')
+            let selectedValue = $(this).children("option:selected").val()
+            $('#cityRightSpecialFeature').html(selectedData)
+            localStorage.setItem('cityRight', JSON.stringify({ name: selectedValue, special_feature: selectedData }))
+        })
+
+        $("#clearAll").click(function() {
+            let isClear = confirm('Сбролсить всё?');
+            if (isClear) {
+                localStorage.clear()
+                window.location.reload();
+            }
+        });
+
+
+    });
+    </script>
+</body>
+
+</html>
